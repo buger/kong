@@ -4,6 +4,7 @@
 
 local utils = require "kong.tools.utils"
 local ffi = require "ffi"
+local pl_file = require "pl.file"
 
 
 local floor = math.floor
@@ -49,6 +50,25 @@ end
 
 
 local function new(self)
+  if self and self.configuration and self.configuration.prefix then
+    local filename = self.configuration.prefix .. "/node.id"
+    if pl_file.access_time(filename) then
+      local id = pl_file.read(filename)
+      if utils.is_valid_uuid(id) then
+        node_id = id
+      end
+    end
+
+    if not node_id then
+      local id = utils.uuid()
+      local ok = pl_file.write(filename, id)
+      if ok then
+        node_id = id
+      end
+    end
+  end
+
+
   local _NODE = {}
 
 
