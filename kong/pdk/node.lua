@@ -5,6 +5,7 @@
 local utils = require "kong.tools.utils"
 local ffi = require "ffi"
 local pl_file = require "pl.file"
+local pl_path = require "pl.path"
 
 
 local floor = math.floor
@@ -51,18 +52,28 @@ end
 
 local function new(self)
   if self and self.configuration and self.configuration.prefix then
-    local filename = self.configuration.prefix .. "/node.id"
-    if pl_file.access_time(filename) then
-      local id = pl_file.read(filename)
-      if utils.is_valid_uuid(id) then
-        node_id = id
+    local filename = self.configuration.prefix .. "/kong.id"
+    if pl_path.exists(filename) then
+      local id, read_err = pl_file.read(filename)
+      if read_err then
+        ngx.log(ngx.WARN, "failed to read from kong.id: " .. read_err)
+      else
+        if not utils.is_valid_uuid(id) then
+          ngx.log(ngx.WARN, "invalid node_id in kong.id")
+        else
+          ngx.log(ngx.INFO, "restored node_id from kong.id")
+          node_id = id
+        end
       end
     end
 
     if not node_id then
       local id = utils.uuid()
-      local ok = pl_file.write(filename, id)
-      if ok then
+      ngx.log(ngx.DEBUG, "persisting node_id to kong.id: " .. id)
+      local ok, write_err = pl_file.write(filename, id)
+      if not ok then
+        ngx.log(ngx.WARN, "failed to persist node_id to kong.id: " .. write_err)
+      else
         node_id = id
       end
     end
