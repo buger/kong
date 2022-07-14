@@ -6,6 +6,7 @@ local utils = require "kong.tools.utils"
 local ffi = require "ffi"
 local pl_file = require "pl.file"
 local pl_path = require "pl.path"
+local pl_dir = require "pl.dir"
 
 
 local floor = math.floor
@@ -52,7 +53,8 @@ end
 
 local function new(self)
   if self and self.configuration and self.configuration.prefix then
-    local filename = self.configuration.prefix .. "/kong.id"
+    local prefix = self.configuration.prefix
+    local filename = prefix .. "/kong.id"
     if pl_path.exists(filename) then
       local id, read_err = pl_file.read(filename)
       if read_err then
@@ -70,11 +72,21 @@ local function new(self)
     if not node_id then
       local id = utils.uuid()
       ngx.log(ngx.DEBUG, "persisting node_id to kong.id: " .. id)
-      local ok, write_err = pl_file.write(filename, id)
-      if not ok then
-        ngx.log(ngx.WARN, "failed to persist node_id to kong.id: " .. write_err)
-      else
-        node_id = id
+      local prefix_exists = true
+      if not pl_path.exists(prefix) then
+        local ok, err = pl_dir.makepath(prefix)
+        if not ok then
+          ngx.log(ngx.WARN, "failed to create directory: ", err)
+          prefix_exists = false
+        end
+      end
+      if prefix_exists then
+        local ok, write_err = pl_file.write(filename, id)
+        if not ok then
+          ngx.log(ngx.WARN, "failed to persist node_id to kong.id: " .. write_err)
+        else
+          node_id = id
+        end
       end
     end
   end
