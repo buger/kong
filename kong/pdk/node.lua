@@ -52,6 +52,7 @@ end
 
 
 local function new(self)
+  --[[
   if self and self.configuration and self.configuration.prefix then
     local prefix = self.configuration.prefix
     local filename = prefix .. "/kong.id"
@@ -90,6 +91,7 @@ local function new(self)
       end
     end
   end
+  --]]
 
 
   local _NODE = {}
