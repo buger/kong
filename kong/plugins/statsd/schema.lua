@@ -25,7 +25,7 @@ local SERVICE_IDENTIFIERS = {
 }
 
 local WORKSPACE_IDENTIFIERS = {
-  "workspace_id", "workspace_name"
+  "workspace_id", "workspace_name",
 }
 
 
