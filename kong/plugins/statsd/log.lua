@@ -342,8 +342,9 @@ function _M.execute(conf)
 
   kong.log.debug("Status code is within given status code ranges")
 
-  -- TODO: cache worker id in module local variable
-  worker_id = ngx.worker.id()
+  if not worker_id then
+    worker_id = ngx.worker.id()
+  end
 
   conf._prefix = conf.prefix
 
