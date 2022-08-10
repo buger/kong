@@ -38,14 +38,14 @@ statsd_mt.__index = statsd_mt
 
 
 function statsd_mt:new(conf)
-  local sock, err
+  local sock, err, ok
   if conf.use_tcp then
     sock = ngx_socket_tcp()
     sock:settimeout(1000)
-    _, err = sock:connect(conf.host, conf.port)
+    ok, err = sock:connect(conf.host, conf.port)
   else
     sock = ngx_socket_udp()
-    _, err = sock:setpeername(conf.host, conf.port)
+    ok, err = sock:setpeername(conf.host, conf.port)
   end
 
   if err then
