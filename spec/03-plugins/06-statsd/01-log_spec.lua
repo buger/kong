@@ -1,10 +1,7 @@
 local helpers       = require "spec.helpers"
 local pl_file       = require "pl.file"
 
--- kong < 2.3
-local get_hostname = require("kong.tools.utils").get_hostname or
--- kong > 2.2
-                     require("kong.pdk.node").new().get_hostname
+local get_hostname = require("kong.pdk.node").new().get_hostname
 
 
 local fmt = string.format
