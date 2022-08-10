@@ -184,7 +184,7 @@ return {
                   }, },
                 },
               },
-            }, },
+          }, },
           { allow_status_codes = {
             type = "array",
             elements = {
