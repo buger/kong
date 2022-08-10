@@ -195,6 +195,7 @@
   [#9028](https://github.com/Kong/kong/pull/9028)
 - **ACME**: `allow_any_domain` field added. It is default to false and if set to true, the gateway will
   ignore the `domains` field.
+  [#9047](https://github.com/Kong/kong/pull/9047)
 
 ### Deprecations
 
@@ -370,6 +371,15 @@ a restart (e.g., upon a plugin server crash).
   [#8934](https://github.com/Kong/kong/pull/8934)
 - Fixed an issue that cause unexpected 404 error on creating/updating configs with invalid options
   [#8831](https://github.com/Kong/kong/pull/8831)
+- Fixed an issue that causes crashes when calling some PDK APIs
+  [#8604](https://github.com/Kong/kong/pull/8604)
+- Fixed an issue that cause crashes when go PDK calls return arrays
+  [#8891](https://github.com/Kong/kong/pull/8891)
+- Plugin servers now shutdowns gracefully when Kong exits
+  [#8923](https://github.com/Kong/kong/pull/8923)
+- CLI now prompts with `[y/n]` instead of `[Y/n]`, as it does not take `y` as default
+  [#9114](https://github.com/Kong/kong/pull/9114)
+
 
 #### Plugins
 
@@ -394,6 +404,15 @@ a restart (e.g., upon a plugin server crash).
   which may cause Postgres DEADLOCK problem [#8968](https://github.com/Kong/kong/pull/8968)
 - **Response-rate-Limiting**: Fix a disordered behaviour caused by `pairs` function
   which may cause Postgres DEADLOCK problem [#8968](https://github.com/Kong/kong/pull/8968)
+- **gRPC gateway**: Fix the handling of boolean fields from URI arguments
+  [#9180](https://github.com/Kong/kong/pull/9180)
+
+### Performance
+
+- **ACME**: Added cache for `domains_matcher`
+  [#9048](https://github.com/Kong/kong/pull/9048)
+- `pdk.request.get_header` changed to a faster implementation, not to fetch all headers every time it's called
+  [#8716](https://github.com/Kong/kong/pull/8716)
 
 
 #### Clustering
