@@ -1,9 +1,6 @@
-local log
+local log = require "kong.plugins.statsd.log"
 
 describe("Plugin: statsd (log_helper)", function()
-  setup(function()
-    log = require "kong.plugins.statsd.log"
-  end)
 
   it("should be true with any status code when allow_status_codes is nil", function()
     local allow_status_codes = nil
