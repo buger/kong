@@ -38,22 +38,19 @@ statsd_mt.__index = statsd_mt
 
 
 function statsd_mt:new(conf)
-  local sock
+  local sock, err
   if conf.use_tcp then
     sock = ngx_socket_tcp()
     sock:settimeout(1000)
-    local _, err = sock:connect(conf.host, conf.port)
-    if err then
-      return nil, fmt("failed to connect to %s:%s: %s", conf.host,
-                      tostring(conf.port), err)
-    end
+    _, err = sock:connect(conf.host, conf.port)
   else
     sock = ngx_socket_udp()
-    local _, err = sock:setpeername(conf.host, conf.port)
-    if err then
-      return nil, fmt("failed to connect to %s:%s: %s", conf.host,
-                      tostring(conf.port), err)
-    end
+    _, err = sock:setpeername(conf.host, conf.port)
+  end
+
+  if err then
+    return nil, fmt("failed to connect to %s:%s: %s", conf.host,
+      tostring(conf.port), err)
   end
 
   local statsd = {
