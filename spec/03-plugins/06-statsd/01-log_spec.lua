@@ -391,7 +391,7 @@ for _, strategy in helpers.each_strategy() do
               stat_type           = "timer",
             }
           },
-          udp_packet_size = 80,
+          udp_packet_size = 100,
         }
       }
 
@@ -490,24 +490,6 @@ for _, strategy in helpers.each_strategy() do
               sample_rate         = 1,
               service_identifier  = "service_host",
             }
-          },
-        },
-      }
-
-      bp.plugins:insert {
-        name = "statsd",
-        route = { id = routes[25].id },
-        config = {
-          host = "127.0.0.1",
-          port = UDP_PORT,
-          service_prefix_in_metric = true,
-          metrics = {
-            {
-              name = "request_count",
-              stat_type = "counter",
-              sample_rate = 1,
-              service_identifier = "service_name",
-            },
           },
         },
       }
@@ -674,20 +656,20 @@ for _, strategy in helpers.each_strategy() do
         local ok, metrics, err = thread:join()
         assert(ok, metrics)
         assert(#metrics == metrics_count, err)
-        assert.contains("kong.statsd1.request.count:1|c", metrics)
-        assert.contains("kong.statsd1.request.size:%d+|ms", metrics, true)
-        assert.contains("kong.statsd1.response.size:%d+|ms", metrics, true)
-        assert.contains("kong.statsd1.latency:%d+|ms", metrics, true)
-        assert.contains("kong.statsd1.request.status.200:1|c", metrics)
-        assert.contains("kong.statsd1.request.status.total:1|c", metrics)
-        assert.contains("kong.statsd1.upstream_latency:%d*|ms", metrics, true)
-        assert.contains("kong.statsd1.kong_latency:%d*|ms", metrics, true)
-        assert.contains("kong.statsd1.user.uniques:robert|s", metrics)
-        assert.contains("kong.statsd1.user.robert.request.count:1|c", metrics)
-        assert.contains("kong.statsd1.user.robert.request.status.total:1|c", metrics)
-        assert.contains("kong.statsd1.user.robert.request.status.200:1|c", metrics)
+        assert.contains("kong.service.statsd1.request.count:1|c", metrics)
+        assert.contains("kong.service.statsd1.request.size:%d+|ms", metrics, true)
+        assert.contains("kong.service.statsd1.response.size:%d+|ms", metrics, true)
+        assert.contains("kong.service.statsd1.latency:%d+|ms", metrics, true)
+        assert.contains("kong.service.statsd1.request.status.200:1|c", metrics)
+        assert.contains("kong.service.statsd1.request.status.total:1|c", metrics)
+        assert.contains("kong.service.statsd1.upstream_latency:%d*|ms", metrics, true)
+        assert.contains("kong.service.statsd1.kong_latency:%d*|ms", metrics, true)
+        assert.contains("kong.service.statsd1.user.uniques:robert|s", metrics)
+        assert.contains("kong.service.statsd1.user.robert.request.count:1|c", metrics)
+        assert.contains("kong.service.statsd1.user.robert.request.status.total:1|c", metrics)
+        assert.contains("kong.service.statsd1.user.robert.request.status.200:1|c", metrics)
 
-        assert.contains("kong.statsd1.workspace." .. uuid_pattern .. ".status.200:1|c", metrics, true)
+        assert.contains("kong.service.statsd1.workspace." .. uuid_pattern .. ".status.200:1|c", metrics, true)
         assert.contains("kong.route." .. uuid_pattern .. ".user.robert.status.200:1|c", metrics, true)
 
         -- shdict_usage metrics, just test one is enough
@@ -712,22 +694,22 @@ for _, strategy in helpers.each_strategy() do
         local ok, metrics, err = thread:join()
         assert(ok, metrics)
         assert(#metrics == metrics_count, err)
-        assert.contains("prefix.statsd13.request.count:1|c", metrics)
-        assert.contains("prefix.statsd13.latency:%d+|ms", metrics, true)
-        assert.contains("prefix.statsd13.request.size:%d+|ms", metrics, true)
-        assert.contains("prefix.statsd13.request.status.200:1|c", metrics)
-        assert.contains("prefix.statsd13.request.status.total:1|c", metrics)
-        assert.contains("prefix.statsd13.response.size:%d+|ms", metrics, true)
-        assert.contains("prefix.statsd13.upstream_latency:%d*|ms", metrics, true)
-        assert.contains("prefix.statsd13.kong_latency:%d*|ms", metrics, true)
-        assert.contains("prefix.statsd13.user.uniques:robert|s", metrics)
-        assert.contains("prefix.statsd13.user.robert.request.count:1|c", metrics)
-        assert.contains("prefix.statsd13.user.robert.request.status.total:1|c",
+        assert.contains("prefix.service.statsd13.request.count:1|c", metrics)
+        assert.contains("prefix.service.statsd13.latency:%d+|ms", metrics, true)
+        assert.contains("prefix.service.statsd13.request.size:%d+|ms", metrics, true)
+        assert.contains("prefix.service.statsd13.request.status.200:1|c", metrics)
+        assert.contains("prefix.service.statsd13.request.status.total:1|c", metrics)
+        assert.contains("prefix.service.statsd13.response.size:%d+|ms", metrics, true)
+        assert.contains("prefix.service.statsd13.upstream_latency:%d*|ms", metrics, true)
+        assert.contains("prefix.service.statsd13.kong_latency:%d*|ms", metrics, true)
+        assert.contains("prefix.service.statsd13.user.uniques:robert|s", metrics)
+        assert.contains("prefix.service.statsd13.user.robert.request.count:1|c", metrics)
+        assert.contains("prefix.service.statsd13.user.robert.request.status.total:1|c",
                         metrics)
-        assert.contains("prefix.statsd13.user.robert.request.status.200:1|c",
+        assert.contains("prefix.service.statsd13.user.robert.request.status.200:1|c",
                         metrics)
 
-        assert.contains("prefix.statsd13.workspace." .. uuid_pattern .. ".status.200:1|c",
+        assert.contains("prefix.service.statsd13.workspace." .. uuid_pattern .. ".status.200:1|c",
           metrics, true)
         assert.contains("prefix.route." .. uuid_pattern .. ".user.robert.status.200:1|c", metrics, true)
 
@@ -746,7 +728,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.equal("kong.statsd5.request.count:1|c", res)
+        assert.equal("kong.service.statsd5.request.count:1|c", res)
       end)
       it("status_count", function()
         local thread = helpers.udp_server(UDP_PORT, 2,2)
@@ -761,8 +743,8 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.contains("kong.statsd3.request.status.200:1|c", res)
-        assert.contains("kong.statsd3.request.status.total:1|c", res)
+        assert.contains("kong.service.statsd3.request.status.200:1|c", res)
+        assert.contains("kong.service.statsd3.request.status.total:1|c", res)
       end)
       it("request_size", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -777,7 +759,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd4.request.size:%d+|ms", res)
+        assert.matches("kong.service.statsd4.request.size:%d+|ms", res)
       end)
       it("latency", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -792,7 +774,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd2.latency:.*|ms", res)
+        assert.matches("kong.service.statsd2.latency:.*|ms", res)
       end)
       it("response_size", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -807,7 +789,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd6.response.size:%d+|ms", res)
+        assert.matches("kong.service.statsd6.response.size:%d+|ms", res)
       end)
       it("upstream_latency", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -822,7 +804,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd7.upstream_latency:.*|ms", res)
+        assert.matches("kong.service.statsd7.upstream_latency:.*|ms", res)
       end)
       it("kong_latency", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -837,7 +819,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd8.kong_latency:.*|ms", res)
+        assert.matches("kong.service.statsd8.kong_latency:.*|ms", res)
       end)
       it("unique_users", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -852,7 +834,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong.statsd9.user.uniques:robert|s", res)
+        assert.matches("kong.service.statsd9.user.uniques:robert|s", res)
       end)
       it("status_count_per_user", function()
         local thread = helpers.udp_server(UDP_PORT, 2, 2)
@@ -868,8 +850,8 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.contains("kong.statsd10.user.robert.request.status.200:1|c", res)
-        assert.contains("kong.statsd10.user.robert.request.status.total:1|c", res)
+        assert.contains("kong.service.statsd10.user.robert.request.status.200:1|c", res)
+        assert.contains("kong.service.statsd10.user.robert.request.status.total:1|c", res)
       end)
       it("request_per_user", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
@@ -885,7 +867,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.matches("kong.statsd11.user.bob.request.count:1|c", res)
+        assert.matches("kong.service.statsd11.user.bob.request.count:1|c", res)
       end)
       it("latency as gauge", function()
         local thread = helpers.udp_server(UDP_PORT)
@@ -900,7 +882,7 @@ for _, strategy in helpers.each_strategy() do
 
         local ok, res = thread:join()
         assert.True(ok)
-        assert.matches("kong%.statsd12.latency:%d+|g", res)
+        assert.matches("kong%.service.statsd12.latency:%d+|g", res)
       end)
       it("consumer by consumer_id", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
@@ -916,7 +898,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.matches("^kong.statsd14.user.uniques:" .. uuid_pattern .. "|s", res)
+        assert.matches("^kong.service.statsd14.user.uniques:" .. uuid_pattern .. "|s", res)
       end)
       it("status_count_per_user_per_route", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
@@ -948,7 +930,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.matches("kong.statsd16.workspace." .. uuid_pattern .. ".status.200:1|c", res)
+        assert.matches("kong.service.statsd16.workspace." .. uuid_pattern .. ".status.200:1|c", res)
       end)
       it("status_count_per_workspace", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
@@ -964,7 +946,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(res, err)
-        assert.matches("kong.statsd17.workspace." .. workspace_name_pattern .. ".status.200:1|c", res)
+        assert.matches("kong.service.statsd17.workspace." .. workspace_name_pattern .. ".status.200:1|c", res)
       end)
       it("logs over TCP with one metric", function()
         local thread = helpers.tcp_server(TCP_PORT, { timeout = 10 })
@@ -980,7 +962,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, metrics = thread:join()
 
         assert.True(ok)
-        assert.matches("kong.statsd18.request.count:1|c", metrics)
+        assert.matches("kong.service.statsd18.request.count:1|c", metrics)
       end)
       it("combines udp packets", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
@@ -997,13 +979,13 @@ for _, strategy in helpers.each_strategy() do
         assert(ok, res)
         assert(res, err)
         -- doesn't has single of metrics packet
-        assert.not_matches("^kong.statsd19.request.count:%d+|c$", res)
-        assert.not_matches("^kong.statsd19.upstream_latency:%d+|ms$", res)
-        assert.not_matches("^kong.statsd19.kong_latency:%d+|ms$", res)
+        assert.not_matches("^kong.service.statsd19.request.count:%d+|c$", res)
+        assert.not_matches("^kong.service.statsd19.upstream_latency:%d+|ms$", res)
+        assert.not_matches("^kong.service.statsd19.kong_latency:%d+|ms$", res)
         -- has a combined multi-metrics packet
-        assert.matches("^kong.statsd19.request.count:%d+|c\n" ..
-          "kong.statsd19.upstream_latency:%d+|ms\n" ..
-          "kong.statsd19.kong_latency:%d+|ms$", res)
+        assert.matches("^kong.service.statsd19.request.count:%d+|c\n" ..
+          "kong.service.statsd19.upstream_latency:%d+|ms\n" ..
+          "kong.service.statsd19.kong_latency:%d+|ms$", res)
       end)
       it("combines and splits udp packets", function()
         local thread = helpers.udp_server(UDP_PORT, 2, 2)
@@ -1020,15 +1002,15 @@ for _, strategy in helpers.each_strategy() do
         assert(ok, res)
         assert(#res == 2, err)
         -- doesn't contain single of metrics packet
-        assert.not_contains("^kong.statsd20.request.count:%d+|c$", res, true)
-        assert.not_contains("^kong.statsd20.upstream_latency:%d+|ms$", res,  true)
+        assert.not_contains("^kong.service.statsd20.request.count:%d+|c$", res, true)
+        assert.not_contains("^kong.service.statsd20.upstream_latency:%d+|ms$", res,  true)
         -- doesn't contain multi-metrics packet with all three metrics
-        assert.not_contains("^kong.stats20.request.count:%d+|c\n" ..
-          "kong.statsd20.upstream_latency:%d+|ms\n" ..
-          "kong.statsd20.kong_latency:%d+|ms$", res)
+        assert.not_contains("^kong.service.stats20.request.count:%d+|c\n" ..
+          "kong.service.statsd20.upstream_latency:%d+|ms\n" ..
+          "kong.service.statsd20.kong_latency:%d+|ms$", res)
         -- has a combined multi-metrics packet with up to 100 bytes
-        assert.contains("^kong.statsd20.request.count:%d+|c\n" .. "kong.statsd20.upstream_latency:%d+|ms$", res, true)
-        assert.contains("^kong.statsd20.kong_latency:%d+|ms$", res, true)
+        assert.contains("^kong.service.statsd20.request.count:%d+|c\n" .. "kong.service.statsd20.upstream_latency:%d+|ms$", res, true)
+        assert.contains("^kong.service.statsd20.kong_latency:%d+|ms$", res, true)
       end)
       it("throws an error if udp_packet_size is too small", function()
         local thread = helpers.udp_server(UDP_PORT, 3, 2)
@@ -1045,9 +1027,9 @@ for _, strategy in helpers.each_strategy() do
         assert(ok, res)
         assert(#res == 3, err)
 
-        assert.contains("^kong.statsd21.request.count:%d+|c$", res ,true)
-        assert.contains("^kong.statsd21.upstream_latency:%d+|ms$", res, true)
-        assert.contains("^kong.statsd21.kong_latency:%d+|ms$", res, true)
+        assert.contains("^kong.service.statsd21.request.count:%d+|c$", res ,true)
+        assert.contains("^kong.service.statsd21.upstream_latency:%d+|ms$", res, true)
+        assert.contains("^kong.service.statsd21.kong_latency:%d+|ms$", res, true)
 
         local err_log = pl_file.read(helpers.test_conf.nginx_err_logs)
         assert.matches("", err_log)
@@ -1066,8 +1048,8 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(#res == 2, err)
-        assert.contains("^kong." .. uuid_pattern .. ".request.count:1|c$", res, true)
-        assert.contains("^kong." .. uuid_pattern .. ".request.status.200:1|c$", res, true)
+        assert.contains("^kong.service." .. uuid_pattern .. ".request.count:1|c$", res, true)
+        assert.contains("^kong.service." .. uuid_pattern .. ".request.status.200:1|c$", res, true)
       end)
       it("logs service by service_host", function()
         local thread = helpers.udp_server(UDP_PORT, 2, 2)
@@ -1083,8 +1065,8 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(#res == 2, err)
-        assert.contains("^kong.statsd23.request.count:1|c$", res, true)
-        assert.contains("^kong.statsd23.request.status.200:1|c$", res, true)
+        assert.contains("^kong.service.statsd23.request.count:1|c$", res, true)
+        assert.contains("^kong.service.statsd23.request.status.200:1|c$", res, true)
       end)
       it("logs service by service_name", function()
         local thread = helpers.udp_server(UDP_PORT, 2, 2)
@@ -1100,9 +1082,9 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(#res == 2, err)
-        assert.contains("^kong." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
+        assert.contains("^kong.service." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
           ".request.count:1|c$", res, true)
-        assert.contains("^kong." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
+        assert.contains("^kong.service." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
           ".request.status.200:1|c$", res, true)
       end)
       it("logs service by service_name_or_host falls back to service host when service name is not set", function()
@@ -1119,9 +1101,9 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(#res == 2, err)
-        assert.contains("^kong." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
+        assert.contains("^kong.service." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
           ".request.count:1|c$", res, true)
-        assert.contains("^kong." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
+        assert.contains("^kong.service." .. string.gsub(helpers.mock_upstream_host, "%.", "_") ..
           ".request.status.200:1|c$", res, true)
       end)
       it("logs service by service_name emits unnamed if service name is not set", function()
@@ -1138,8 +1120,8 @@ for _, strategy in helpers.each_strategy() do
         local ok, res, err = thread:join()
         assert(ok, res)
         assert(#res == 2, err)
-        assert.contains("^kong.unnamed.request.count:1|c$", res, true)
-        assert.contains("^kong.unnamed.request.status.200:1|c$", res, true)
+        assert.contains("^kong.service.unnamed.request.count:1|c$", res, true)
+        assert.contains("^kong.service.unnamed.request.status.200:1|c$", res, true)
       end)
     end)
 
@@ -1161,26 +1143,7 @@ for _, strategy in helpers.each_strategy() do
         local ok, metrics, err = thread:join()
         assert(ok, metrics)
         assert(metrics, err)
-        assert.matches("kong.node." .. hostname .. ".unnamed.request.count:1|c", metrics, nil, true)
-      end)
-    end)
-
-    describe("service_prefix_in_metric", function()
-      it("metric name contains 'service.'", function()
-        local thread = helpers.udp_server(UDP_PORT, 1, 2)
-        local response = assert(proxy_client:send {
-          method  = "GET",
-          path    = "/request",
-          headers = {
-            host  = "logging25.com"
-          }
-        })
-        assert.res_status(200, response)
-
-        local ok, res, err = thread:join()
-        assert(ok, res)
-        assert(res, err)
-        assert.equal("kong.service.statsd25.request.count:1|c", res)
+        assert.matches("kong.node." .. hostname .. ".service.unnamed.request.count:1|c", metrics, nil, true)
       end)
     end)
 

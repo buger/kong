@@ -238,13 +238,10 @@ local function get_scope_name(conf, message, service_identifier)
   local scope_name = ""
 
   if service then
+    scope_name = "service."
     -- don't fail on ce schema where service_identifier is not defined
     if not service_identifier then
       service_identifier = "service_name_or_host"
-    end
-
-    if conf.service_prefix_in_metric then
-      scope_name = "service."
     end
 
     local service_name = get_service_id[service_identifier](service)
@@ -254,9 +251,7 @@ local function get_scope_name(conf, message, service_identifier)
       scope_name = scope_name .. re_gsub(service_name, [[\.]], "_", "oj")
     end
   elseif api then
-    if conf.service_prefix_in_metric then
-      scope_name = "api."
-    end
+    scope_name = "api."
 
     if not api or api == ngx.null then
       scope_name = scope_name .. "unnamed"
