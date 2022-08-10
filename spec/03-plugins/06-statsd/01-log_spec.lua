@@ -1235,7 +1235,6 @@ for _, strategy in helpers.each_strategy() do
 
   describe("Plugin: statsd (log) [#" .. strategy .. "]", function()
     local proxy_client
-    --local shdict_count
 
     setup(function()
       local bp = helpers.get_db_utils(strategy)
