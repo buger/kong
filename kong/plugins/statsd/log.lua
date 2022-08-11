@@ -13,6 +13,7 @@ local match = ngx.re.match
 local ipairs = ipairs
 local tonumber = tonumber
 local knode = (kong and kong.node) and kong.node or require "kong.pdk.node".new()
+local null = ngx.null
 
 local START_RANGE_IDX = 1
 local END_RANGE_IDX   = 2
@@ -120,16 +121,16 @@ local get_service_id = {
     return service and service.host
   end,
   service_name_or_host = function(service)
-    return service and (service.name ~= ngx.null and
+    return service and (service.name ~= null and
       service.name or service.host)
   end
 }
 
 local get_workspace_id = {
-  workspace_id   = function(workspace)
+  workspace_id   = function()
     return ws.get_workspace_id()
   end,
-  workspace_name = function(workspace)
+  workspace_name = function()
     local workspace = ws.get_workspace()
     return workspace.name
   end
@@ -181,7 +182,7 @@ local metrics = {
   end,
   status_count_per_workspace = function (scope_name, message, metric_config, logger, conf)
     local get_workspace_id = get_workspace_id[metric_config.workspace_identifier or conf.workspace_identifier_default]
-    local workspace_id     = get_workspace_id(message.workspace)
+    local workspace_id     = get_workspace_id()
 
     if workspace_id then
       logger:send_statsd(string_format("%s.workspace.%s.status.%s", scope_name,
@@ -267,7 +268,7 @@ local function get_scope_name(conf, message, service_identifier)
     end
 
     local service_name = get_service_id[service_identifier](service)
-    if not service_name or service_name == ngx.null  then
+    if not service_name or service_name == null  then
       scope_name = scope_name .. "unnamed"
     else
       scope_name = scope_name .. re_gsub(service_name, [[\.]], "_", "oj")
@@ -275,7 +276,7 @@ local function get_scope_name(conf, message, service_identifier)
   elseif api then
     scope_name = "api."
 
-    if not api or api == ngx.null then
+    if not api or api == null then
       scope_name = scope_name .. "unnamed"
     else
       scope_name = scope_name .. re_gsub(api.name, [[\.]], "_", "oj")
