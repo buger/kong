@@ -126,10 +126,10 @@ local get_service_id = {
 }
 
 local get_workspace_id = {
-  workspace_id         = function(workspace)
+  workspace_id   = function(workspace)
     return ws.get_workspace_id()
   end,
-  workspace_name       = function(workspace)
+  workspace_name = function(workspace)
     local workspace = ws.get_workspace()
     return workspace.name
   end
@@ -231,20 +231,22 @@ if ngx.config.ngx_lua_version >= 10011 then
   metrics.shdict_usage = function (_, message, metric_config, logger)
     -- we don't need this for every request, send every 1 minute
     -- also only one worker needs to send this because it's shared
-    if worker_id == 0 then
-      local now = ngx_time()
-      if shdict_metrics_last_sent + SHDICT_METRICS_SEND_THRESHOLD < now then
-        shdict_metrics_last_sent = now
-        for shdict_name, shdict in pairs(ngx.shared) do
-          logger:send_statsd(string_format("node.%s.shdict.%s.free_space",
-            hostname, shdict_name),
-            shdict:free_space(), logger.stat_types.gauge,
-            metric_config.sample_rate)
-          logger:send_statsd(string_format("node.%s.shdict.%s.capacity",
-            hostname, shdict_name),
-            shdict:capacity(), logger.stat_types.gauge,
-            metric_config.sample_rate)
-        end
+    if worker_id ~= 0 then
+      return
+    end
+
+    local now = ngx_time()
+    if shdict_metrics_last_sent + SHDICT_METRICS_SEND_THRESHOLD < now then
+      shdict_metrics_last_sent = now
+      for shdict_name, shdict in pairs(ngx.shared) do
+        logger:send_statsd(string_format("node.%s.shdict.%s.free_space",
+          hostname, shdict_name),
+          shdict:free_space(), logger.stat_types.gauge,
+          metric_config.sample_rate)
+        logger:send_statsd(string_format("node.%s.shdict.%s.capacity",
+          hostname, shdict_name),
+          shdict:capacity(), logger.stat_types.gauge,
+          metric_config.sample_rate)
       end
     end
   end
