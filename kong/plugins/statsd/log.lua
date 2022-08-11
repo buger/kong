@@ -206,24 +206,26 @@ local metrics = {
         metric_config.sample_rate)
     end
   end,
-  cache_datastore_hits_total = function (scope_name, message, metric_config, logger, conf)
-    local value = (message.cache_metrics or {})["cache_datastore_hits_total"]
+  cache_metrics = function (scope_name, message, metric_config, logger, conf)
+    local cache_metrics = message.cache_metrics
+    if not cache_metrics then
+      return
+    end
+
+    local hit_value = cache_metrics["cache_datastore_hits_total"]
     -- only send metrics when the value is not nil
-    if value ~= nil then
+    if hit_value ~= nil then
       logger:send_statsd(string_format("%s.cache_datastore_hits_total", scope_name),
-        value, logger.stat_types.counter,
-        metric_config.sample_rate)
+        hit_value, logger.stat_types.counter, metric_config.sample_rate)
+    end
+
+    local miss_value = cache_metrics["cache_datastore_misses_total"]
+    -- only send metrics when the value is not nil
+    if miss_value ~= nil then
+      logger:send_statsd(string_format("%s.cache_datastore_misses_total", scope_name),
+        miss_value, logger.stat_types.counter, metric_config.sample_rate)
     end
   end,
-  cache_datastore_misses_total = function (scope_name, message, metric_config, logger, conf)
-    local value = (message.cache_metrics or {})["cache_datastore_misses_total"]
-    -- only send metrics when the value is not nil
-    if value ~= nil then
-      logger:send_statsd(string_format("%s.cache_datastore_misses_total", scope_name),
-        value, logger.stat_types.counter,
-        metric_config.sample_rate)
-    end
-  end
 }
 
 -- add shdict metrics
