@@ -1232,9 +1232,6 @@ for _, strategy in helpers.each_strategy() do
 
       proxy_client = helpers.proxy_client()
 
-      -- this is to ensure we have the right number of shdicts being used so we know
-      -- how many udp packets are we expecting below
-      --shdict_count = #get_shdicts()
     end)
 
     teardown(function()
