@@ -253,7 +253,7 @@ end
 local function get_scope_name(conf, message, service_identifier)
   local api = message.api
   local service = message.service
-  local scope_name = ""
+  local scope_name
 
   if service then
     scope_name = "service."
