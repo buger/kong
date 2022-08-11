@@ -206,6 +206,24 @@ local metrics = {
         metric_config.sample_rate)
     end
   end,
+  cache_datastore_hits_total = function (scope_name, message, metric_config, logger, conf)
+    local value = (message.cache_metrics or {})["cache_datastore_hits_total"]
+    -- only send metrics when the value is not nil
+    if value ~= nil then
+      logger:send_statsd(string_format("%s.cache_datastore_hits_total", scope_name),
+        value, logger.stat_types.counter,
+        metric_config.sample_rate)
+    end
+  end,
+  cache_datastore_misses_total = function (scope_name, message, metric_config, logger, conf)
+    local value = (message.cache_metrics or {})["cache_datastore_misses_total"]
+    -- only send metrics when the value is not nil
+    if value ~= nil then
+      logger:send_statsd(string_format("%s.cache_datastore_misses_total", scope_name),
+        value, logger.stat_types.counter,
+        metric_config.sample_rate)
+    end
+  end
 }
 
 -- add shdict metrics
@@ -348,6 +366,8 @@ function _M.execute(conf)
   end
 
   local message = kong.log.serialize({ngx = ngx, kong = kong, })
+  message.cache_metrics = ngx.ctx.cache_metrics
+
   local ok, err = ngx_timer_at(0, log, conf, message)
   if not ok then
     kong.log.err("failed to create timer: ", err)

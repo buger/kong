@@ -150,15 +150,48 @@ function _M.new(opts)
 end
 
 
+local function cache_accessed(hit_lvl)
+  local counter_name
+
+  if hit_lvl == 2 then
+    counter_name = "l2_hits"
+  elseif hit_lvl == 3 then
+    counter_name = "l2_misses"
+  end
+
+  if counter_name then
+    -- increment in ngx.ctx
+    local cache_metrics = ngx.ctx.cache_metrics or {
+      cache_datastore_hits_total = 0,
+      cache_datastore_misses_total = 0,
+    }
+
+    -- assume it's a hit
+    local ctx_key = "cache_datastore_hits_total"
+    if counter_name == "l2_misses" then
+      ctx_key = "cache_datastore_misses_total"
+    end
+
+    cache_metrics[ctx_key] = cache_metrics[ctx_key] + 1
+
+    -- make sure it's set -- we may have init'ed cache_metrics in this call
+    ngx.ctx.cache_metrics = cache_metrics
+  end
+
+  return "ok"
+end
+
 function _M:get(key, opts, cb, ...)
   if type(key) ~= "string" then
     error("key must be a string", 2)
   end
 
-  local v, err = self.mlcache:get(key, opts, cb, ...)
+  local v, err, hit_lvl = self.mlcache:get(key, opts, cb, ...)
   if err then
     return nil, "failed to get from node cache: " .. err
   end
+
+  cache_accessed(hit_lvl)
 
   return v
 end
