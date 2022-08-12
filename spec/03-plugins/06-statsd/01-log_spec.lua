@@ -639,7 +639,7 @@ for _, strategy in helpers.each_strategy() do
 
     describe("metrics", function()
       it("logs over UDP with default metrics", function()
-        local metrics_count = 16
+        local metrics_count = 14
         -- shdict_usage metrics
         metrics_count = metrics_count + shdict_count * 2
 
@@ -675,11 +675,9 @@ for _, strategy in helpers.each_strategy() do
         -- shdict_usage metrics, just test one is enough
         assert.contains("kong.node..*.shdict.kong.capacity:%d+|g", metrics, true)
         assert.contains("kong.node..*.shdict.kong.free_space:%d+|g", metrics, true)
-        assert.contains("kong.service.statsd1.cache_datastore_hits_total:%d*|c", metrics, true)
-        assert.contains("kong.service.statsd1.cache_datastore_misses_total:%d*|c", metrics, true)
       end)
       it("logs over UDP with default metrics and new prefix", function()
-        local metrics_count = 16
+        local metrics_count = 14
         -- shdict_usage metrics, can't test again in 1 minutes
         -- metrics_count = metrics_count + shdict_count * 2
 
@@ -714,8 +712,6 @@ for _, strategy in helpers.each_strategy() do
         assert.contains("prefix.service.statsd13.workspace." .. uuid_pattern .. ".status.200:1|c",
           metrics, true)
         assert.contains("prefix.route." .. uuid_pattern .. ".user.robert.status.200:1|c", metrics, true)
-        assert.contains("prefix.service.statsd13.cache_datastore_hits_total:%d*|c", metrics, true)
-        assert.contains("prefix.service.statsd13.cache_datastore_misses_total:%d*|c", metrics, true)
       end)
       it("request_count", function()
         local thread = helpers.udp_server(UDP_PORT, 1, 2)
