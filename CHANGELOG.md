@@ -197,6 +197,8 @@
   ignore the `domains` field.
 - Plugins with colliding priorities have now deterministic sorting based on their name
   [#8957](https://github.com/Kong/kong/pull/8957)
+- **Statsd**: add `service.` prefix for the metrics that related with the Service.
+  [#9046](https://github.com/Kong/kong/pull/9046)
 
 ### Deprecations
 
@@ -218,6 +220,7 @@
   `kong.response.getRawBody`, `kong.service.response.getRawBody` and Python's `kong.request.get_raw_body`,
   `kong.response.get_raw_body`, `kong.service.response.get_raw_body` respectively.
   [#8623](https://github.com/Kong/kong/pull/8623)
+- Statsd Advanced Plugin has been deprecated.
 
 #### Configuration
 
@@ -337,6 +340,8 @@
 - **AWS-Lambda**: add support for cross account invocation through
   configuration properties `aws_assume_role_arn` and
   `aws_role_session_name`.[#8900](https://github.com/Kong/kong/pull/8900)
+- **Statsd**: :fireworks: **Newly open-sourced plugin capabilities**: All capabilities of [Statsd Advanced](https://docs.konghq.com/hub/kong-inc/statsd-advanced/) are now bundled in [Statsd](https://docs.konghq.com/hub/kong-inc/statsd).
+  [#9046](https://github.com/Kong/kong/pull/9046)
 
 #### Configuration
 
