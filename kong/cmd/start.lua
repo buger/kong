@@ -6,7 +6,43 @@ local kong_global = require "kong.global"
 local kill = require "kong.cmd.utils.kill"
 local log = require "kong.cmd.utils.log"
 local DB = require "kong.db"
+local lfs = require "lfs"
 
+
+local function is_socket(path)
+  return lfs.attributes(path, "mode") == "socket"
+end
+
+local function handle_dangling_unix_sockets(prefix, remove)
+  local found
+
+  for child in lfs.dir(prefix) do
+    local path = prefix .. "/" .. child
+    if is_socket(path) then
+      found = found or {}
+      table.insert(found, path)
+    end
+  end
+
+  if not found then
+    return
+  end
+
+  if remove then
+    for _, sock in ipairs(found) do
+      if is_socket(sock) then
+        log.info("removing leftover unix socket: " .. sock)
+        assert(os.remove(sock))
+      end
+    end
+  else
+    local msg = [[found dangling unix sockets in %q:
+%s
+Kong may fail to start. Use the --cleanup-sockets flag to remove them when starting Kong.
+]]
+    log.warn(msg:format(prefix, table.concat(found, "\n") .. "\n"))
+  end
+end
 
 local function execute(args)
   args.db_timeout = args.db_timeout * 1000
@@ -25,6 +61,9 @@ local function execute(args)
 
   assert(not kill.is_running(conf.nginx_pid),
          "Kong is already running in " .. conf.prefix)
+
+
+  handle_dangling_unix_sockets(conf.prefix, args.cleanup_sockets)
 
   _G.kong = kong_global.new()
   kong_global.init_pdk(_G.kong, conf)
@@ -98,6 +137,12 @@ Options:
  --lock-timeout   (default 60)        When --run-migrations is enabled, timeout,
                                       in seconds, for nodes waiting on the
                                       leader node to finish running migrations.
+
+
+ --cleanup-sockets (optional boolean)  Find and remove any existing unix sockets
+                                       in the Kong prefix directory before starting
+                                       Kong. This is useful for recovering from an
+                                       unclean shutdown of Kong.
 ]]
 
 return {
