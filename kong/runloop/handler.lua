@@ -784,7 +784,7 @@ do
       counter = counter + 1
     end
 
-    local new_router, err = Router.new(routes, router_cache, router_cache_neg)
+    local new_router, err = Router.new(routes, router_cache, router_cache_neg, router)
     if not new_router then
       return nil, "could not create router: " .. err
     end
